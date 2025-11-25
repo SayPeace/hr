@@ -1,46 +1,40 @@
-import { useRoutes, type RouteObject } from "react-router-dom";
-import MainLayout from "../layouts/MainLayout";
-import HomePage from "../pages/home/HomePage";
+import { type RouteObject, useRoutes } from "react-router-dom";
 import LoginPage from "../pages/auth/LoginPage";
-import AdminDashboard from "../pages/dashboard/AdminDashboard";
-import UserDashboard from "../pages/dashboard/UserDashboard";
-import TaskListPage from "../pages/tasks/TaskListPage";
-
+import AdminLayout from "../layouts/AdminLayout";
+import UserLayout from "../layouts/UserLayout";
+import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
+import AdminTasksPage from "../pages/admin/AdminTaskPages";
+import UserDashboardPage from "../pages/user/UserDashboardPage";
+import UserTasksPage from "../pages/user/UserTaskPages";
+import { RequireAuth } from "./RequiredAuth";
+import UserProfilePage from "../pages/user/UserProfilePage";
 
 const routes: RouteObject[] = [
-    {
-        path: "/login",
-        element: <LoginPage />,
-    },
-    {
-        path: "/",
-        element: <MainLayout />,
-        children: [
-            {
-                index: true,
-                element: <UserDashboard />,
-            },
-            {
-                path: "home",
-                element: <HomePage />,
-            },
-            {
-                path: "admin",
-                element: <AdminDashboard />,
-            },
-            {
-                path: "dashboard",
-                element: <UserDashboard />,
-            },
-            {
-                path: "tasks",
-                element: <TaskListPage />,
-            },
-
-        ],
-    },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      { index: true, element: <AdminDashboardPage /> },
+      { path: "tasks", element: <AdminTasksPage /> },
+    ],
+  },
+  {
+    path: "/app",
+    element: (
+      <RequireAuth>
+        <UserLayout />
+      </RequireAuth>
+    ),
+    children: [
+      { index: true, element: <UserDashboardPage /> },
+      { path: "tasks", element: <UserTasksPage /> },
+      { path: "profile", element: <UserProfilePage /> },
+    ],
+  },
 ];
 
-export const AppRouter = () => {
-    return useRoutes(routes);
-};
+export const AppRouter = () => useRoutes(routes);

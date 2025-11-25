@@ -1,10 +1,26 @@
-import { Button, Card, Form, Input, Typography } from "antd";
+import { Button, Card, Form, Input, Typography, message } from "antd";
+import { useAuth } from "../../context/AuthContext";
+import { useLocation, useNavigate } from "react-router-dom";
+// import { defaultUser, DEFAULT_PASSWORD } from "../../mock/users";
 
-const { Title } = Typography;
+const { Title,  } = Typography;
 
 const LoginPage = () => {
-  const onFinish = (values: any) => {
-    console.log("Login:", values);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [form] = Form.useForm();
+
+  // Where to go after login (if redirected)
+  const from = (location.state as any)?.from?.pathname || "/app";
+
+  const onFinish = async (values: any) => {
+    try {
+      await login(values.email, values.password);
+      navigate(from, { replace: true });
+    } catch (err: any) {
+      message.error(err.message || "Login failed");
+    }
   };
 
   return (
@@ -14,17 +30,37 @@ const LoginPage = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        padding: 16,
       }}
     >
-      <Card style={{ width: 380 }}>
-        <Title level={3} style={{ textAlign: "center" }}>Login</Title>
+      <Card style={{ width: 380, maxWidth: "100%" }}>
+        <Title level={3} style={{ textAlign: "center" }}>
+          Saypeace HR Login
+        </Title>
 
-        <Form layout="vertical" onFinish={onFinish}>
-          <Form.Item label="Email" name="email" rules={[{ required: true }]}>
-            <Input type="email" placeholder="user@example.com" />
+        {/* Temporary hint for dev/testing */}
+        {/* <Paragraph type="secondary" style={{ fontSize: 12 }}>
+          <Text strong>Demo credentials:</Text>
+          <br />
+          Email: <Text code>{defaultUser.email}</Text>
+          <br />
+          Password: <Text code>{DEFAULT_PASSWORD}</Text>
+        </Paragraph> */}
+
+        <Form form={form} layout="vertical" onFinish={onFinish}>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ required: true, message: "Please enter your email" }]}
+          >
+            <Input type="email" placeholder="user@saypeace.com" />
           </Form.Item>
 
-          <Form.Item label="Password" name="password" rules={[{ required: true }]}>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please enter your password" }]}
+          >
             <Input.Password placeholder="********" />
           </Form.Item>
 
