@@ -7,8 +7,11 @@ export interface Task {
   description: string;
   priority: TaskPriority;
   status: TaskStatus;
+
+  assigneeId: string;          // 👈 NEW
   assigneeName: string;
   assigneeRole: "internal" | "external";
+
   dueDate: string; // ISO string
   createdAt: string;
 }

@@ -8,6 +8,7 @@ export const defaultUser: User = {
   avatarUrl: "https://pbs.twimg.com/profile_images/1865509128254185472/qb8qK5B2_400x400.jpg",
   jobTitle: "Software Engineer",
   department: "Engineering",
+  phone: ""
 };
 
 // And a default password just for frontend demo

@@ -1,6 +1,8 @@
 import { Layout, Menu, Typography, Avatar, Dropdown, Space } from "antd";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext"
+import { NotificationBell } from "../components/common/NotificationBell";
+
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -63,26 +65,33 @@ const UserLayout = () => {
           </Title>
 
           {user && (
-            <Dropdown
-              menu={{ items: profileMenuItems }}
-              trigger={["click"]}
-            >
-              <Space style={{ cursor: "pointer" }}>
-                <Avatar src={user.avatarUrl}>
-                  {user.name.charAt(0).toUpperCase()}
-                </Avatar>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <Text strong style={{ lineHeight: 1 }}>
-                    {user.name}
-                  </Text>
-                  <Text type="secondary" style={{ fontSize: 12, lineHeight: 1 }}>
-                    {user.jobTitle || "User"}
-                  </Text>
-                </div>
-              </Space>
-            </Dropdown>
+            <Space size="middle">
+              <NotificationBell /> {/* This is already a component, no change needed here. */}
+              <Dropdown
+                menu={{ items: profileMenuItems }}
+                trigger={["click"]}
+              >
+                <Space style={{ cursor: "pointer" }}>
+                  <Avatar src={user.avatarUrl}>
+                    {user.name.charAt(0).toUpperCase()}
+                  </Avatar>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <Text strong style={{ lineHeight: 1 }}>
+                      {user.name}
+                    </Text>
+                    <Text
+                      type="secondary"
+                      style={{ fontSize: 12, lineHeight: 1 }}
+                    >
+                      {user.jobTitle || "User"}
+                    </Text>
+                  </div>
+                </Space>
+              </Dropdown>
+            </Space>
           )}
         </Header>
+
 
         <Content style={{ margin: 16 }}>
           <Outlet />

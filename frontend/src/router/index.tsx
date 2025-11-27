@@ -1,4 +1,4 @@
-import { type RouteObject, useRoutes } from "react-router-dom";
+import { type RouteObject, useRoutes, Navigate } from "react-router-dom";
 import LoginPage from "../pages/auth/LoginPage";
 import AdminLayout from "../layouts/AdminLayout";
 import UserLayout from "../layouts/UserLayout";
@@ -10,6 +10,11 @@ import { RequireAuth } from "./RequiredAuth";
 import UserProfilePage from "../pages/user/UserProfilePage";
 
 const routes: RouteObject[] = [
+  // default: redirect "/" → "/login"
+  {
+    path: "/",
+    element: <Navigate to="/login" replace />,
+  },
   {
     path: "/login",
     element: <LoginPage />,
@@ -32,7 +37,7 @@ const routes: RouteObject[] = [
     children: [
       { index: true, element: <UserDashboardPage /> },
       { path: "tasks", element: <UserTasksPage /> },
-      { path: "profile", element: <UserProfilePage /> },
+      { path: "profile", element: <UserProfilePage /> }, // ✅ profile route
     ],
   },
 ];
