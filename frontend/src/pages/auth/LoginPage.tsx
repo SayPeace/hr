@@ -1,7 +1,8 @@
-import { Button, Card, Form, Input, Typography, message } from "antd";
-import { useAuth } from "../../context/AuthContext";
+// frontend/src/pages/auth/LoginPage.tsx
+import { useEffect, useState } from "react";
+import { Button, Card, Form, Input, Typography, Alert } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
-// import { defaultUser, DEFAULT_PASSWORD } from "../../mock/users";
+import { useAuth } from "../../context/AuthContext";
 
 const { Title,  } = Typography;
 
@@ -10,16 +11,38 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Where to go after login (if redirected)
-  const from = (location.state as any)?.from?.pathname || "/app";
+  // If query param ?mode=admin, pre-fill admin email
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const mode = params.get("mode");
+    if (mode === "admin") {
+      form.setFieldsValue({
+        email: "admin@saypeace.com",
+      });
+    }
+  }, [location.search, form]);
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: { email: string; password: string }) => {
+    setError(null);
+    setLoading(true);
     try {
-      await login(values.email, values.password);
-      navigate(from, { replace: true });
-    } catch (err: any) {
-      message.error(err.message || "Login failed");
+      const user = await login(values.email, values.password);
+
+      // Redirect based on role
+      if (user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/app", { replace: true });
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Login failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,40 +56,53 @@ const LoginPage = () => {
         padding: 16,
       }}
     >
-      <Card style={{ width: 380, maxWidth: "100%" }}>
+      <Card style={{ width: "100%", maxWidth: 400 }}>
         <Title level={3} style={{ textAlign: "center" }}>
-          Saypeace HR Login
+          Sign in
         </Title>
+       
 
-        {/* Temporary hint for dev/testing */}
-        {/* <Paragraph type="secondary" style={{ fontSize: 12 }}>
-          <Text strong>Demo credentials:</Text>
-          <br />
-          Email: <Text code>{defaultUser.email}</Text>
-          <br />
-          Password: <Text code>{DEFAULT_PASSWORD}</Text>
-        </Paragraph> */}
 
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+        {error && (
+          <Alert
+            type="error"
+            message={error}
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
+
+        <Form layout="vertical" form={form} onFinish={onFinish}>
           <Form.Item
-            label="Email"
             name="email"
-            rules={[{ required: true, message: "Please enter your email" }]}
+            label="Email"
+            rules={[
+              { required: true, message: "Please enter your email" },
+              { type: "email", message: "Enter a valid email" },
+            ]}
           >
-            <Input type="email" placeholder="user@saypeace.com" />
+            <Input placeholder="Enter email" />
           </Form.Item>
 
           <Form.Item
-            label="Password"
             name="password"
+            label="Password"
             rules={[{ required: true, message: "Please enter your password" }]}
           >
-            <Input.Password placeholder="********" />
+            <Input.Password placeholder="Enter password" />
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" block>
-            Login
-          </Button>
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              loading={loading}
+              style={{ marginTop: 8 }}
+            >
+              Login
+            </Button>
+          </Form.Item>
         </Form>
       </Card>
     </div>

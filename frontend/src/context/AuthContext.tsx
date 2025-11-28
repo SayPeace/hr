@@ -1,62 +1,82 @@
-import { createContext, useContext, useState, type ReactNode, useEffect } from "react";
-import type { User } from "../types/user";
-import { defaultUser, DEFAULT_PASSWORD } from "../mock/users";
+// frontend/src/context/AuthContext.tsx
+import {
+  createContext,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
 
-interface AuthContextType {
-  user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  updateUser: (updates: Partial<User>) => void;
+export type UserRole = "admin" | "user" | "external";
+
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  jobTitle?: string;
+  avatarUrl?: string;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface AuthContextValue {
+  user: AuthUser | null;
+  login: (email: string, password: string) => Promise<AuthUser>;
+  logout: () => void;
+}
+
+// Default admin + one normal user (mock only)
+const MOCK_USERS: AuthUser[] = [
+  {
+    id: "1",
+    name: "Admin User",
+    email: "admin@saypeace.com",
+    role: "admin",
+    jobTitle: "HR Admin",
+  },
+  {
+    id: "2",
+    name: "Test Employee",
+    email: "user@saypeace.com",
+    role: "user",
+    jobTitle: "Operations Staff",
+  },
+];
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-
-  // Load from localStorage on first mount (optional but nice)
-  useEffect(() => {
-    const stored = localStorage.getItem("saypeace_user");
-    if (stored) {
-      setUser(JSON.parse(stored));
-    }
-  }, []);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   const login = async (email: string, password: string) => {
-    // Mock login logic for now
-    if (email === defaultUser.email && password === DEFAULT_PASSWORD) {
-      setUser(defaultUser);
-      localStorage.setItem("saypeace_user", JSON.stringify(defaultUser));
-    } else {
+    // 🔐 DEV-ONLY: hardcoded password
+    const PASSWORD = "password123";
+
+    const found = MOCK_USERS.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase()
+    );
+
+    if (!found || password !== PASSWORD) {
       throw new Error("Invalid email or password");
     }
+
+    setUser(found);
+    return found; // so caller can redirect based on role
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("saypeace_user");
-  };
-
-  const updateUser = (updates: Partial<User>) => {
-    setUser((prev) => {
-      if (!prev) return prev;
-      const updated = { ...prev, ...updates };
-      localStorage.setItem("saypeace_user", JSON.stringify(updated));
-      return updated;
-    });
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = (): AuthContextValue => {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return ctx;
 };

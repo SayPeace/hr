@@ -1,4 +1,4 @@
-import { type RouteObject, useRoutes, Navigate } from "react-router-dom";
+import { type RouteObject, useRoutes } from "react-router-dom";
 import LoginPage from "../pages/auth/LoginPage";
 import AdminLayout from "../layouts/AdminLayout";
 import UserLayout from "../layouts/UserLayout";
@@ -8,12 +8,18 @@ import UserDashboardPage from "../pages/user/UserDashboardPage";
 import UserTasksPage from "../pages/user/UserTaskPages";
 import { RequireAuth } from "./RequiredAuth";
 import UserProfilePage from "../pages/user/UserProfilePage";
+import AdminUsersPage from "../pages/admin/AdminUserPage";
+import AdminSettingsPage from "../pages/admin/AdminSettingPage";
+import LandingPage from "../pages/LandingPage";
+import { RequireAdmin } from "./RequiredAdmin";
+import AdminProfilePage from "../pages/admin/AdminProfilePage";
+
+
 
 const routes: RouteObject[] = [
-  // default: redirect "/" → "/login"
   {
     path: "/",
-    element: <Navigate to="/login" replace />,
+    element: <LandingPage />, // 👈 landing
   },
   {
     path: "/login",
@@ -21,10 +27,17 @@ const routes: RouteObject[] = [
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: (
+      <RequireAdmin>
+        <AdminLayout />
+      </RequireAdmin>
+    ),
     children: [
       { index: true, element: <AdminDashboardPage /> },
       { path: "tasks", element: <AdminTasksPage /> },
+      { path: "users", element: <AdminUsersPage /> },
+      { path: "settings", element: <AdminSettingsPage /> },
+       { path: "profile", element: <AdminProfilePage /> },
     ],
   },
   {
@@ -37,9 +50,11 @@ const routes: RouteObject[] = [
     children: [
       { index: true, element: <UserDashboardPage /> },
       { path: "tasks", element: <UserTasksPage /> },
-      { path: "profile", element: <UserProfilePage /> }, // ✅ profile route
+      { path: "profile", element: <UserProfilePage /> },
     ],
   },
 ];
+
+
 
 export const AppRouter = () => useRoutes(routes);
