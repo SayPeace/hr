@@ -44,7 +44,7 @@ const LandingPage = () => {
             communication — all in a clean dashboard.
           </Paragraph>
 
-          <Space direction="vertical" size="large" style={{ marginTop: 24 }}>
+          {/* <Space direction="vertical" size="large" style={{ marginTop: 24 }}>
             <Space wrap>
               <Link to="/login?mode=admin">
                 <Button type="primary" size="large">
@@ -56,11 +56,8 @@ const LandingPage = () => {
               </Link>
             </Space>
 
-            <Text type="secondary">
-              This is a demo build. Authentication is using mock credentials
-              until the backend is connected.
-            </Text>
-          </Space>
+            
+          </Space> */}
         </div>
       </Content>
 

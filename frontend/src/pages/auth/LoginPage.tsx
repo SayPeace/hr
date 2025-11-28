@@ -123,14 +123,7 @@ const LoginPage = () => {
             </Form.Item>
           </Form>
 
-          <Card size="small" style={{ background: "#fafafa" }} bordered={false}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              <div>Demo logins (mocked):</div>
-              <div>Admin: <code>admin@saypeace.test</code></div>
-              <div>User: <code>user@saypeace.test</code></div>
-              <div>Password: anything (not validated yet)</div>
-            </Text>
-          </Card>
+          
         </Space>
       </Card>
     </div>
