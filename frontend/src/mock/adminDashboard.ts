@@ -14,6 +14,7 @@ export interface AdminDashboardStats {
 export interface StatusChartItem {
   name: string;
   value: number;
+  [key: string]: string | number;
 }
 
 export interface WeeklyTasksChartItem {

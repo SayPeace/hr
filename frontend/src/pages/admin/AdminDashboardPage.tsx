@@ -49,6 +49,9 @@ const AdminDashboardPage = () => {
     upcomingTasks,
   } = useAdminDashboard();
 
+  // ✅ Cast statusChart to the type Recharts expects
+  // ✅ Cast statusChart to the type Recharts expects
+  const statusChartData = statusChart as any[];
   const upcomingColumns: ColumnsType<UpcomingTaskItem> = [
     {
       title: "Task",
@@ -147,19 +150,17 @@ const AdminDashboardPage = () => {
               <ResponsiveContainer>
                 <PieChart>
                   <Pie
-                    data={statusChart}
+                    data={statusChartData}
                     dataKey="value"
                     nameKey="name"
                     innerRadius={50}
                     outerRadius={80}
                     paddingAngle={4}
                   >
-                    {statusChart.map((entry, index) => (
+                    {statusChartData.map((entry: any, index: number) => (
                       <Cell
-                        key={`cell-${entry.name}`}
-                        fill={
-                          STATUS_COLORS[index % STATUS_COLORS.length]
-                        }
+                        key={`cell-${entry.name ?? index}`}
+                        fill={STATUS_COLORS[index % STATUS_COLORS.length]}
                       />
                     ))}
                   </Pie>
@@ -201,11 +202,7 @@ const AdminDashboardPage = () => {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="completed"
-                    name="Completed"
-                  />
+                  <Line type="monotone" dataKey="completed" name="Completed" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -226,15 +223,15 @@ const AdminDashboardPage = () => {
               dataSource={activity}
               renderItem={(item) => (
                 <List.Item key={item.id}>
-                  <Space direction="vertical" size={2} style={{ width: "100%" }}>
+                  <Space
+                    direction="vertical"
+                    size={2}
+                    style={{ width: "100%" }}
+                  >
                     <Space>
                       <Text strong>{item.title}</Text>
-                      {item.type === "task" && (
-                        <Tag color="blue">Task</Tag>
-                      )}
-                      {item.type === "user" && (
-                        <Tag color="purple">User</Tag>
-                      )}
+                      {item.type === "task" && <Tag color="blue">Task</Tag>}
+                      {item.type === "user" && <Tag color="purple">User</Tag>}
                     </Space>
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {item.description}

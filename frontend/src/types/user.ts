@@ -1,10 +1,9 @@
+// src/types/user.ts
+
+// frontend/src/types/user.ts
 export type UserRole = "admin" | "user" | "external";
 
-export interface User {
-  [x: string]: string;
-  [x: string]: string;
-  [x: string]: string;
-  phone: string;
+export interface AuthUser {
   id: string;
   name: string;
   email: string;
@@ -12,4 +11,9 @@ export interface User {
   avatarUrl?: string;
   jobTitle?: string;
   department?: string;
+}
+
+export interface AdminUser extends AuthUser {
+  status?: "active" | "inactive";
+  createdAt?: string;
 }

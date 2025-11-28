@@ -1,79 +1,87 @@
-import { Avatar, Card, Col, Form, Input, Row, Typography, Button, message } from "antd";
+import { Avatar, Button, Card, Form, Input, Space, Typography } from "antd";
 import { useAuth } from "../../context/AuthContext";
 
 const { Title, Text } = Typography;
 
+interface ProfileFormValues {
+  name: string;
+  jobTitle?: string;
+  department?: string;
+}
+
 const UserProfilePage = () => {
   const { user, updateUser } = useAuth();
-  const [form] = Form.useForm();
 
-  if (!user) return null;
+  if (!user) {
+    return <Text>No user loaded</Text>;
+  }
 
-  const onFinish = (values: any) => {
+  const [form] = Form.useForm<ProfileFormValues>();
+
+  const handleFinish = (values: ProfileFormValues) => {
     updateUser(values);
-    message.success("Profile updated");
   };
 
   return (
     <>
       <Title level={3}>My Profile</Title>
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={8}>
-          <Card style={{ textAlign: "center" }}>
-            <Avatar
-              src={user.avatarUrl}
-              size={96}
-              style={{ marginBottom: 16 }}
-            >
+      <Card>
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
+          <Space>
+            <Avatar size={64} src={user.avatarUrl}>
               {user.name.charAt(0).toUpperCase()}
             </Avatar>
-            <Title level={4} style={{ marginBottom: 4 }}>
-              {user.name}
-            </Title>
-            <Text type="secondary">{user.email}</Text>
             <div>
+              <Title level={4} style={{ margin: 0 }}>
+                {user.name}
+              </Title>
+              <Text type="secondary">{user.email}</Text>
+              <br />
+              <Text>{user.jobTitle || "No job title set"}</Text>
+              <br />
               <Text type="secondary">
-                {user.jobTitle || "Role: User"}
+                {user.department
+                  ? `Department: ${user.department}`
+                  : "No department set"}
               </Text>
             </div>
-          </Card>
-        </Col>
+          </Space>
 
-        <Col xs={24} md={16}>
-          <Card title="Edit Profile">
-            <Form
-              form={form}
-              layout="vertical"
-              initialValues={{
-                name: user.name,
-                jobTitle: user.jobTitle,
-                department: user.department,
-              }}
-              onFinish={onFinish}
+          <Form<ProfileFormValues>
+            form={form}
+            layout="vertical"
+            initialValues={{
+              name: user.name,
+              jobTitle: user.jobTitle,
+              department: user.department,
+            }}
+            onFinish={handleFinish}
+            style={{ maxWidth: 480 }}
+          >
+            <Form.Item
+              label="Full Name"
+              name="name"
+              rules={[{ required: true, message: "Please enter your name" }]}
             >
-              <Form.Item
-                label="Full Name"
-                name="name"
-                rules={[{ required: true, message: "Please enter your name" }]}
-              >
-                <Input />
-              </Form.Item>
+              <Input />
+            </Form.Item>
 
-              <Form.Item label="Job Title" name="jobTitle">
-                <Input />
-              </Form.Item>
+            <Form.Item label="Job Title" name="jobTitle">
+              <Input placeholder="e.g. Frontend Engineer" />
+            </Form.Item>
 
-              <Form.Item label="Department" name="department">
-                <Input />
-              </Form.Item>
+            <Form.Item label="Department" name="department">
+              <Input placeholder="e.g. Engineering" />
+            </Form.Item>
 
+            <Form.Item>
               <Button type="primary" htmlType="submit">
                 Save Changes
               </Button>
-            </Form>
-          </Card>
-        </Col>
-      </Row>
+            </Form.Item>
+          </Form>
+        </Space>
+      </Card>
     </>
   );
 };

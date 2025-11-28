@@ -1,9 +1,17 @@
-import type { Task, TaskPriority, TaskStatus } from "../types/task";
+import type { TaskPriority, TaskStatus } from "../types/task";
 
-export interface AdminTask extends Task {
+export interface AdminTask {
+  id: string;
+  title: string;
+  description: string;
+  priority: TaskPriority;
+  status: TaskStatus;
+  dueDate: string;
+  createdAt: string;
   assigneeId: string;
   assigneeName: string;
-  // NOTE: assigneeRole comes from Task and is "internal" | "external"
+  assigneeRole: "internal" | "external";
+  tags?: string[]; // ✅ add this line
 }
 
 const daysFromNow = (days: number) =>

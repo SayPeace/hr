@@ -1,46 +1,54 @@
-// frontend/src/pages/auth/LoginPage.tsx
+// src/pages/auth/LoginPage.tsx
 import { useEffect, useState } from "react";
-import { Button, Card, Form, Input, Typography, Alert } from "antd";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  Typography,
+  Alert,
+  Space,
+} from "antd";
 import { useAuth } from "../../context/AuthContext";
 
-const { Title,  } = Typography;
+const { Title, Text } = Typography;
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // If query param ?mode=admin, pre-fill admin email
+  // If already logged in, redirect based on role
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const mode = params.get("mode");
-    if (mode === "admin") {
-      form.setFieldsValue({
-        email: "admin@saypeace.com",
-      });
+    if (user) {
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/app");
+      }
     }
-  }, [location.search, form]);
+  }, [user, navigate]);
 
-  const onFinish = async (values: { email: string; password: string }) => {
+  const handleSubmit = async (values: { email: string; password: string }) => {
     setError(null);
     setLoading(true);
     try {
-      const user = await login(values.email, values.password);
+      // Build a mocked AuthUser object from the provided credentials (demo mode).
+      // Use the email local-part as the name and infer role from the email prefix.
+      const authUser = {
+        id: values.email,
+        name: values.email.split("@")[0],
+        email: values.email,
+        role: values.email.startsWith("admin") ? "admin" : "user",
+      } as any;
 
-      // Redirect based on role
-      if (user.role === "admin") {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/app", { replace: true });
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Login failed. Please try again."
-      );
+      login(authUser);
+      // Redirect happens in useEffect when `user` is updated
+    } catch (err: any) {
+      setError(err.message || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }
@@ -51,59 +59,79 @@ const LoginPage = () => {
       style={{
         minHeight: "100vh",
         display: "flex",
-        justifyContent: "center",
         alignItems: "center",
+        justifyContent: "center",
         padding: 16,
+        background:
+          "radial-gradient(circle at top, #e6f7ff 0, #ffffff 45%, #fafafa 100%)",
       }}
     >
-      <Card style={{ width: "100%", maxWidth: 400 }}>
-        <Title level={3} style={{ textAlign: "center" }}>
-          Sign in
-        </Title>
-       
+      <Card
+        style={{ maxWidth: 400, width: "100%" }}
+        bordered={false}
+        bodyStyle={{ padding: 24 }}
+      >
+        <Space direction="vertical" style={{ width: "100%" }} size="large">
+          <div style={{ textAlign: "center" }}>
+            <Title level={3} style={{ marginBottom: 4 }}>
+              Saypeace HR Portal
+            </Title>
+            <Text type="secondary">
+              Sign in to manage your tasks and workspace
+            </Text>
+          </div>
 
+          {error && (
+            <Alert
+              type="error"
+              message={error}
+              showIcon
+            />
+          )}
 
-        {error && (
-          <Alert
-            type="error"
-            message={error}
-            showIcon
-            style={{ marginBottom: 16 }}
-          />
-        )}
-
-        <Form layout="vertical" form={form} onFinish={onFinish}>
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: "Please enter your email" },
-              { type: "email", message: "Enter a valid email" },
-            ]}
-          >
-            <Input placeholder="Enter email" />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: true, message: "Please enter your password" }]}
-          >
-            <Input.Password placeholder="Enter password" />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              block
-              loading={loading}
-              style={{ marginTop: 8 }}
+          <Form layout="vertical" onFinish={handleSubmit}>
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                { required: true, message: "Please enter your email" },
+                { type: "email", message: "Please enter a valid email" },
+              ]}
             >
-              Login
-            </Button>
-          </Form.Item>
-        </Form>
+              <Input placeholder="admin@saypeace.test or user@saypeace.test" />
+            </Form.Item>
+
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[
+                { required: true, message: "Please enter your password" },
+              ]}
+            >
+              <Input.Password placeholder="Enter any password for now" />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                loading={loading}
+              >
+                Sign In
+              </Button>
+            </Form.Item>
+          </Form>
+
+          <Card size="small" style={{ background: "#fafafa" }} bordered={false}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              <div>Demo logins (mocked):</div>
+              <div>Admin: <code>admin@saypeace.test</code></div>
+              <div>User: <code>user@saypeace.test</code></div>
+              <div>Password: anything (not validated yet)</div>
+            </Text>
+          </Card>
+        </Space>
       </Card>
     </div>
   );

@@ -123,7 +123,7 @@ const AdminTasksPage = () => {
       assigneeId: "temp-user-id",
       assigneeName: values.assigneeName,
       assigneeRole: values.assigneeRole,
-      tags: values.tags,
+      // tags: values.tags,
     };
 
     setTasks((prev) => [newTask, ...prev]);

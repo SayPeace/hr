@@ -179,8 +179,8 @@ const AdminUsersPage = () => {
     selectedUser == null
       ? []
       : mockAdminTasks.filter(
-          (t) => t.assigneeName === selectedUser.name
-        );
+        (t) => t.assigneeName === selectedUser.name
+      );
 
   return (
     <>

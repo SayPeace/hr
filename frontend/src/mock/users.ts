@@ -1,6 +1,6 @@
-import type { User } from "../types/user";
+import type { AuthUser } from "../types/user";
 
-export const defaultUser: User = {
+export const defaultUser: AuthUser = {
   id: "u1",
   name: "Usman Umar Garba",
   email: "user@saypeace.com",
@@ -8,7 +8,7 @@ export const defaultUser: User = {
   avatarUrl: "https://pbs.twimg.com/profile_images/1865509128254185472/qb8qK5B2_400x400.jpg",
   jobTitle: "Software Engineer",
   department: "Engineering",
-  phone: ""
+  
 };
 
 // And a default password just for frontend demo
